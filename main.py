@@ -9,7 +9,7 @@ from typing import List, Literal
 
 # --- Constants & Configuration ---
 # Fallback URL if system font is missing
-FONT_URL = "https://raw.githubusercontent.com/google/fonts/main/ofl/roboto/Roboto-Regular.ttf" 
+FONT_URL = "https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf" 
 FONT_FILENAME = "arial.ttf"
 SYSTEM_FONT_PATH = "C:/Windows/Fonts/arial.ttf"
 
