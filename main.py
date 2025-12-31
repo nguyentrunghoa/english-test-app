@@ -38,14 +38,17 @@ def download_font_if_missing():
             st.warning(f"Không thể copy font hệ thống: {e}")
 
     # 2. Download from Web (Fallback)
-    with st.spinner(f"Đang tải font từ internet (do không tìm thấy font hệ thống)..."):
+    # 2. Download from Web (Fallback)
+    with st.spinner(f"Đang tải font về máy chủ (lần đầu chạy)..."):
         try:
-            response = requests.get(FONT_URL, timeout=10)
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            response = requests.get(FONT_URL, headers=headers, timeout=15)
             response.raise_for_status()
             with open(FONT_FILENAME, "wb") as f:
                 f.write(response.content)
+            # st.success("Đã tải font thành công!")
         except Exception as e:
-            st.error(f"Lỗi tải font: {e}. Vui lòng kiểm tra kết nối mạng.")
+            st.warning(f"Không thể tải font (Lỗi: {e}). Ứng dụng sẽ dùng font mặc định (có thể lỗi hiển thị tiếng Việt). Cách khắc phục: Hãy upload file '{FONT_FILENAME}' lên GitHub.")
 
 def generate_mock_data(grade: str, total_questions: int, essay_percentage: float) -> List[Question]:
     """Generates mock questions based on inputs."""
