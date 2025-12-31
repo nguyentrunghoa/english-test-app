@@ -5,6 +5,7 @@ import requests
 from fpdf import FPDF
 from dataclasses import dataclass
 import shutil
+from typing import List, Literal
 
 # --- Constants & Configuration ---
 # Fallback URL if system font is missing
