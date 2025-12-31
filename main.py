@@ -10,7 +10,7 @@ from typing import List, Literal
 # --- Constants & Configuration ---
 # Fallback URL if system font is missing
 FONT_URL = "https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.ttf" 
-FONT_FILENAME = "arial.ttf"
+FONT_FILENAME = "font.ttf"
 SYSTEM_FONT_PATH = "C:/Windows/Fonts/arial.ttf"
 
 @dataclass
@@ -123,27 +123,30 @@ def create_pdf(questions: List[Question], grade: str, duration_str: str, score_p
     font_family_name = "TargetFont"
 
     # Register font
+    used_font = font_family_name
     if not os.path.exists(FONT_FILENAME):
         download_font_if_missing()
-        
-    try:
-        # Register the font with a custom family name to avoid confusion
-        pdf.add_font(font_family_name, "", FONT_FILENAME)
-    except RuntimeError:
-        # Fallback or error if font still missing/corrupt, but download check should match
-        st.error("Lỗi font file. PDF có thể không hiển thị tiếng Việt đúng.")
-        return None
+    
+    if os.path.exists(FONT_FILENAME):
+        try:
+            pdf.add_font(font_family_name, "", FONT_FILENAME)
+        except RuntimeError:
+            used_font = "Helvetica"
+            st.error("Lỗi file font. Chuyển sang font mặc định.")
+    else:
+        used_font = "Helvetica"
+        # st.warning("Không tìm thấy font tiếng Việt. Đang dùng font mặc định.")
 
     pdf.add_page()
-    pdf.set_font(font_family_name, size=16)
+    pdf.set_font(used_font, size=16)
     
     # Title
     pdf.cell(0, 10, f"ĐỀ THI TIẾNG ANH - {grade.upper()}", new_x="LMARGIN", new_y="NEXT", align="C")
-    pdf.set_font(font_family_name, size=12)
+    pdf.set_font(used_font, size=12)
     pdf.cell(0, 10, f"Thời gian: {duration_str} | Tổng điểm: 100", new_x="LMARGIN", new_y="NEXT", align="C")
     pdf.ln(5)
     
-    pdf.set_font(font_family_name, size=11)
+    pdf.set_font(used_font, size=11)
     
     for q in questions:
         point_text = f"{score_per_q:.2f} điểm"
@@ -152,7 +155,7 @@ def create_pdf(questions: List[Question], grade: str, duration_str: str, score_p
         if pdf.get_y() > 250: 
             pdf.add_page()
             
-        pdf.set_font(font_family_name, size=11) # Reset font style if changed
+        pdf.set_font(used_font, size=11) # Reset font style if changed
         
         # Question Text
         # Using multi_cell for wrapping text
@@ -169,7 +172,7 @@ def create_pdf(questions: List[Question], grade: str, duration_str: str, score_p
             current_y = pdf.get_y()
             if current_y > 250: # Check page break for options too
                  pdf.add_page()
-                 pdf.set_font(font_family_name, size=11)
+                 pdf.set_font(used_font, size=11)
             
             pdf.set_x(20) # Hardcoded 20mm indent (Margin 10 + 10)
             pdf.multi_cell(0, 6, opt_str)
